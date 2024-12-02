@@ -1,0 +1,21 @@
+$TTL 12000
+oleksandr.loc.      IN       SOA       ns1.oleksandr.loc.    masterhost.oleksandr.loc (
+      4967        ; Serial
+      10000      ; Refresh
+      3600        ; Retry
+      500000   ; Expire
+      86400     ; 1 day TTL neg
+);
+
+oleksandr.loc.    IN           NS       ns1.oleksandr.loc.
+
+
+localhost         IN        A           127.0.0.1
+ns1               IN        A           172.16.16.1
+ws1               IN        A           172.16.16.2
+wind              IN        A           172.16.16.3
+
+
+@                 IN        A           172.16.16.1
+www               IN        A           172.16.16.1
+lu	IN	A	172.16.16.4

@@ -1,0 +1,6 @@
+mysql/data
+*.tar.gz
+*.log
+media/
+static/
+

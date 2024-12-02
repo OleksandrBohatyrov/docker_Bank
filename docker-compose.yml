@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  mysql:
+    build:
+      context: ./mysql
+    container_name: mysql
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: user_balance_db
+      MYSQL_USER: oleksandr2
+      MYSQL_PASSWORD: 123
+    ports:
+      - "3306:3306"
+
+  django-app:
+    build:
+      context: ./nginx/site/BohatyrovBankAPIBackend
+    container_name: django-app
+    depends_on:
+      - mysql
+    networks:
+      - backend
+    volumes:
+      - ./nginx/site/BohatyrovBankAPIBackend/static:/var/www/BohatyrovBankAPIBackend/static
+      - ./nginx/site/BohatyrovBankAPIBackend/media:/var/www/BohatyrovBankAPIBackend/media
+    command: >
+      sh -c "sleep 10 &&
+      python manage.py migrate &&
+      python manage.py collectstatic --noinput &&
+      python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    depends_on:
+      - django-app
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/site/BohatyrovBankAPIBackend/static:/static
+      - ./nginx/site/BohatyrovBankAPIBackend/media:/media
+    command: ["nginx", "-g", "daemon off;"]
+
+  dns:
+    build:
+      context: ./dns
+    container_name: dns
+    networks:
+      - backend
+    ports:
+      - "5353:53/udp"
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql-data:

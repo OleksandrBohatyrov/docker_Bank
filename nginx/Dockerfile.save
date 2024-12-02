@@ -1,0 +1,29 @@
+# Используем официальный образ Nginx
+FROM nginx:latest
+
+
+
+# Копируем конфигурационный файл Nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Копируем сайты и настройки виртуальных хостов
+COPY ./sites-available /etc/nginx/sites-available
+COPY ./sites-enabled /etc/nginx/sites-enabled
+
+# Копируем сам сайт в папку для веб-страниц
+COPY ./site/BohatyrovBankAPIBackend /var/www/BohatyrovBankAPIBackend
+
+# Устанавливаем права на файлы, если нужно
+RUN chmod -R 755 /var/www/ && \
+    chmod -R 755 /etc/nginx/sites-available && \
+    chmod -R 755 /etc/nginx/sites-enabled
+
+RUN if [ -f /etc/nginx/sites-enabled/default ]; then rm /etc/nginx/sites-enabled/default; fi
+
+
+
+# Открываем порт 80 для доступа к сайту
+EXPOSE 80
+
+# Запускаем Nginx в форгрэнд (чтобы контейнер работал постоянно)
+CMD ["nginx", "-g", "daemon off;"]
